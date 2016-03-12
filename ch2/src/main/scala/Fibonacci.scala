@@ -10,6 +10,8 @@ object Fibonacci {
     * Ex 2.1: Write a recursive function to get the nth Fibonacci number
     */
 
-  def fib(n: Int): Int = ???
+  def fib(n: Int): Int = {
+    1
+  }
 
 }

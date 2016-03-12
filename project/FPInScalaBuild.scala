@@ -16,29 +16,38 @@ object FPInScalaBuild extends Build {
     "root",
     file("."),
     settings = scalaProjectSettings
-  ).aggregate(ch2, ch3)
+  ).aggregate(common, ch2, ch3)
+
+  lazy val common = Project(
+    "common",
+    file("common"),
+    settings = scalaProjectSettings
+  )
 
   lazy val ch2 = Project(
     "ch2",
     file("ch2"),
     settings = scalaProjectSettings
-  )
+  ).dependsOn(common % compileTest)
 
   lazy val ch3 = Project(
     "ch3",
     file("ch3"),
     settings = scalaProjectSettings
-  )
+  ).dependsOn(common % compileTest)
+
   /** Dependencies */
 
   def scalaVersionString = "2.11.7"
   def scalaBinaryVersionString = "2.11"
 
-  def scalaTest = "org.scalatest" %% "scalatest" % "2.2.6"
+  def scalaTest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+  def scalaCheck = "org.scalacheck" %% "scalacheck" % "1.13.0" % "test"
 
   lazy val sharedScalaDependencies = Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersionString,
-    scalaTest % "test" intransitive
+    scalaTest intransitive,
+    scalaCheck intransitive
   )
 
   /** Settings */
@@ -89,7 +98,7 @@ object FPInScalaBuild extends Build {
     testOptions in Test += Tests.Argument("-oDF")
   )
 
-  def scalaProjectSettings = Seq(
+  def scalaProjectSettings = projectSettings ++ Seq(
     libraryDependencies ++= sharedScalaDependencies
   )
   
