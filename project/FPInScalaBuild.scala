@@ -42,10 +42,11 @@ object FPInScalaBuild extends Build {
   def scalaBinaryVersionString = "2.11"
 
   def scalaTest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
-  def scalaCheck = "org.scalacheck" %% "scalacheck" % "1.13.0" % "test"
+  def scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
 
   lazy val sharedScalaDependencies = Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersionString,
+    "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.5",
     scalaTest intransitive,
     scalaCheck intransitive
   )
