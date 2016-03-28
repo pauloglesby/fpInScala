@@ -1,6 +1,8 @@
 package ly.analogical
 package fpInScala
 
+import scala.annotation.tailrec
+
 /**
   * Created by Paul Oglesby on 11/03/2016.
   */
@@ -11,7 +13,13 @@ object Fibonacci {
     */
 
   def fib(n: Int): Int = {
-    1
+    require(n >= 0, s"Fibonacci accepts input >= 0 only. Received input $n.")
+    @tailrec
+    def loop(n: Int, a: Int, b: Int): Int = {
+      if (n == 0) b
+      else loop(n - 1, b, a + b)
+    }
+    loop(n, 0, 1)
   }
 
 }
