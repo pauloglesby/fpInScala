@@ -12,9 +12,9 @@ class FibonacciTests extends BaseSpec {
   describe("Fibonacci should") {
 
     it("return IllegalArgumentException for input less than zero") {
-      val illegalFibArgs = Gen.choose(-200, 0)
+      val illegalFibArgs = Gen.choose(-200, -1)
       forAll (illegalFibArgs) { n =>
-        intercept[IllegalArgumentException] {
+        val thrown = intercept[IllegalArgumentException] {
           fib(n)
         }
         assert(thrown.getMessage === "String index out of range: -1")
