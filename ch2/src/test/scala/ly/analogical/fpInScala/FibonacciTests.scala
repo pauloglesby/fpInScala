@@ -1,12 +1,13 @@
 package ly.analogical.fpInScala
 
 import org.scalacheck.Gen
+import org.scalatest.prop.PropertyChecks
 
 import Fibonacci._
 /**
   * Created by Paul Oglesby on 12/03/2016.
   */
-class FibonacciTests extends BaseSpec {
+class FibonacciTests extends BaseSpec with PropertyChecks {
 
   describe("Fibonacci should") {
 
