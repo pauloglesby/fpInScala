@@ -1,5 +1,4 @@
-package ly.analogical
-package fpInScala
+package ly.analogical.fpInScala
 
 import scala.annotation.tailrec
 

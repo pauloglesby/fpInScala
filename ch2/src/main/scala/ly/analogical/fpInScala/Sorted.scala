@@ -1,5 +1,4 @@
-package ly.analogical
-package fpInScala
+package ly.analogical.fpInScala
 
 /**
   * Created by Paul Oglesby on 11/03/2016.

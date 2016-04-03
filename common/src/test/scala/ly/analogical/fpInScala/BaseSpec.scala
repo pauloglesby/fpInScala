@@ -1,5 +1,4 @@
-package ly.analogical
-package fpInScala
+package ly.analogical.fpInScala
 
 import org.scalatest.prop.{Checkers, PropertyChecks}
 import org.scalatest.{FunSpec, Matchers}

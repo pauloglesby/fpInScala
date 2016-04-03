@@ -1,9 +1,8 @@
-package ly.analogical
-package fpInScala
+package ly.analogical.fpInScala
 
-import Fibonacci._
 import org.scalacheck.Gen
 
+import Fibonacci._
 /**
   * Created by Paul Oglesby on 12/03/2016.
   */
