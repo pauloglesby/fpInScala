@@ -17,7 +17,7 @@ class FibonacciTests extends BaseSpec with PropertyChecks {
         val thrown = intercept[IllegalArgumentException] {
           fib(n)
         }
-        assert(thrown.getMessage === "String index out of range: -1")
+        assert(thrown.getMessage startsWith "requirement failed: Fibonacci accepts input >= 0 only. Received input ")
       }
     }
 
