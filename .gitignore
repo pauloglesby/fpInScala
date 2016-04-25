@@ -17,3 +17,4 @@ log/
 /.idea/copyright
 /.idea/scopes
 .settings/
+*/target*
