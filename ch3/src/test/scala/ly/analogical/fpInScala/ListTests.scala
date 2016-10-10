@@ -19,13 +19,24 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
   def equal(xs: List[_]) = new ListMatcher(xs)
 
   @tailrec
-  private[this] def genList[A](xs: List[A], n: Int)(implicit genElem: Gen[A]): List[A] = {
+  private[this] def genList[A](n: Int, xs: List[A] = Nil)(implicit genElem: Gen[A]): List[A] = {
     require(n >= 0, "n must be >= 0 to generate a list!")
     if (n == 0) xs
     else {
       val elem = genElem.sample.get
-      genList(Cons(elem, xs), n - 1)
+      genList(n - 1, Cons(elem, xs))
     }
+  }
+
+  // helper method to check lengths without creating premature skyhooks in the List trait!
+  // may result in duplication though...
+  private[this] def length[A](xs: List[A]): Int = {
+    @tailrec
+    def loop(ys: List[A], l: Int): Int = ys match {
+      case Nil => l
+      case _ => loop(ys.tail, l + 1)
+    }
+    loop(xs, 0)
   }
 
   implicit val genElem: Gen[Char] = Gen.alphaChar
@@ -35,14 +46,14 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
     it("return its `xs` argument if n = 0") {
       val xs = Cons(genElem.sample.get, Nil)
-      genList(Nil, 0) should equal(Nil)
-      genList(xs, 0) should equal(xs)
+      genList(0) should equal(Nil)
+      genList(0, xs) should equal(xs)
     }
 
     it("throw an IllegalArgumentException if n < 0") {
       forAll(Gen.choose(-100, -1)) { n =>
         val exception = intercept[IllegalArgumentException] {
-          genList(Nil, n)
+          genList(n)
         }
         exception.getMessage should equal("requirement failed: n must be >= 0 to generate a list!")
       }
@@ -50,11 +61,20 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("length should") {
+    it("return size of list as number of elements") {
+      forAll(genInts) { n =>
+        val xs = genList(n)
+        length(xs) should equal(n)
+      }
+    }
+  }
+
   describe("List") {
 
     it("tail method should return a new list containing every element of the original except the head") {
       forAll(genInts) { n =>
-        val xs = genList(Nil, n)
+        val xs = genList(n)
         val newList = Cons(genElem.sample.get, xs)
         newList.tail should equal(xs)
       }
@@ -62,7 +82,7 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
     it("head method should return first Some(firstElement) if list non-empty, and None otherwise") {
       forAll(genInts) { n =>
-        val xs = genList(Nil, n)
+        val xs = genList(n)
         val head = xs.head
         val check = xs match {
           case Cons(x, _) => head should equal(Some(x))
@@ -73,11 +93,21 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
     it("setHead method should return a new list with a different head") {
       forAll(genInts) { n =>
-        val xs = genList(Nil, n)
+        val xs = genList(n)
         val head = genElem.sample.get
         val newList = xs.setHead(head)
         newList.tail should equal(xs.tail)
         newList.head.foreach(_ should equal(head))
+      }
+    }
+
+    it("drop method should return new list with first n elements dropped") {
+      forAll(genInts.suchThat(_ >= 1)) { listSize =>
+        forAll(Gen.choose(0, listSize)) { dropCount =>
+          val xs = genList(listSize)
+          val newList = xs.drop(dropCount)
+          length(newList) should equal(length(xs) - dropCount)
+        }
       }
     }
 
