@@ -17,7 +17,7 @@ sealed trait List[+A] {
 
   def tail: List[A] = this match {
     case Cons(_, xs) => xs
-    case _ => Nil
+    case _ => Nil // this is a subjective design choice; could equally return an error - probably better (safer) practice to do so!
   }
 
   def head: Option[A] = this match {
