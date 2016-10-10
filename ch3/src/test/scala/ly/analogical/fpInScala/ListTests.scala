@@ -28,6 +28,17 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
     }
   }
 
+  // helper method to check lengths without creating premature skyhooks in the List trait!
+  // may result in duplication though...
+  private[this] def length[A](xs: List[A]): Int = {
+    @tailrec
+    def loop(ys: List[A], l: Int): Int = ys match {
+      case Nil => l
+      case _ => loop(ys.tail, l + 1)
+    }
+    loop(xs, 0)
+  }
+
   implicit val genElem: Gen[Char] = Gen.alphaChar
   val genInts = Gen.choose(0, 100)
 
@@ -48,6 +59,15 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
       }
     }
 
+  }
+
+  describe("length should") {
+    it("return size of list as number of elements") {
+      forAll(genInts) { n =>
+        val xs = genList(n)
+        length(xs) should equal(n)
+      }
+    }
   }
 
   describe("List") {
@@ -78,6 +98,16 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
         val newList = xs.setHead(head)
         newList.tail should equal(xs.tail)
         newList.head.foreach(_ should equal(head))
+      }
+    }
+
+    it("drop method should return new list with first n elements dropped") {
+      forAll(genInts.suchThat(_ >= 1)) { listSize =>
+        forAll(Gen.choose(0, listSize)) { dropCount =>
+          val xs = genList(listSize)
+          val newList = xs.drop(dropCount)
+          length(newList) should equal(length(xs) - dropCount)
+        }
       }
     }
 
