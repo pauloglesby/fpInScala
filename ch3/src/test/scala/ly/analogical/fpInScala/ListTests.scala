@@ -28,8 +28,13 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
     }
   }
 
-  // helper method to check lengths without creating premature skyhooks in the List trait!
-  // may result in duplication though...
+  /**
+    * Helper method to check lengths without creating premature skyhooks in the List trait!
+    * May result in duplication though...
+    * @param xs List
+    * @tparam A
+    * @return length of list, Int
+    */
   private[this] def length[A](xs: List[A]): Int = {
     @tailrec
     def loop(ys: List[A], l: Int): Int = ys match {
@@ -37,6 +42,40 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
       case _ => loop(ys.tail, l + 1)
     }
     loop(xs, 0)
+  }
+
+  /**
+    * Helper method to assert that each element in a List satisfies an assertion
+    * @param xs
+    * @param assertion
+    * @tparam A
+    */
+  @tailrec
+  private[this] def assertElems[A](xs: List[A])(assertion: A => Unit): Unit = xs match {
+    case Cons(head, Nil) =>
+      assertion(head)
+    case Cons(head, tail) =>
+      assertion(head)
+      assertElems(tail)(assertion)
+    case _ => Unit
+  }
+
+  /**
+    * Helper method to assert that each element in a List satisfies an assertion
+    * @param xs
+    * @param assertion
+    * @tparam A
+    */
+  @tailrec
+  private[this] def assertElemsNonEmpty[A](xs: List[A])(assertion: A => Unit): Unit = xs match {
+    case Nil => assert(false, "Input list is empty")
+    case Cons(head, tail) =>
+      assertion(head)
+      tail match {
+        case Cons(_, _) => assertElemsNonEmpty(tail)(assertion)
+        case _ => Unit
+      }
+    case _ => Unit
   }
 
   implicit val genElem: Gen[Char] = Gen.alphaChar
@@ -108,6 +147,15 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
           val newList = xs.drop(dropCount)
           length(newList) should equal(length(xs) - dropCount)
         }
+      }
+    }
+
+    it("dropWhile method should return new list containing elements where predicate is not matched") {
+      forAll(genInts) { listSize =>
+        val xs = genList(listSize)(genInts)
+        val predicate: Int => Boolean = _ % 2 == 0
+        val newList = xs.dropWhile(predicate)
+        assertElems(newList)(predicate(_) should equal(false))
       }
     }
 

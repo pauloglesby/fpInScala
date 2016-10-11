@@ -53,6 +53,21 @@ sealed trait List[+A] {
     }
     loop(this, n)
   }
+
+  /**
+    * Ex 3.5
+    * Implement dropWhile, which removes elements from the List prefix as long as they match a predicate.
+    */
+
+  def dropWhile(p: A => Boolean): List[A] = {
+    @tailrec
+    def loop(ys: List[A], acc: List[A]): List[A] = ys match {
+      case Nil => acc
+      case Cons(head, tail) => if (!p(head)) loop(tail, Cons(head, acc)) else loop(tail, acc)
+    }
+    loop(this, Nil)
+  }
+
 }
 
 case object Nil extends List[Nothing]
