@@ -8,6 +8,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
+  import List._
+
   private[ListTests] class ListMatcher(expected: List[_]) extends Matcher[List[_]] {
     def apply(actual: List[_]) = MatchResult(
       actual == expected,
@@ -31,6 +33,7 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
   /**
     * Helper method to check lengths without creating premature skyhooks in the List trait!
     * May result in duplication though...
+    *
     * @param xs List
     * @tparam A
     * @return length of list, Int
@@ -46,6 +49,7 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   /**
     * Helper method to assert that each element in a List satisfies an assertion
+    *
     * @param xs
     * @param assertion
     * @tparam A
@@ -62,6 +66,7 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   /**
     * Helper method to assert that each element in a List satisfies an assertion
+    *
     * @param xs
     * @param assertion
     * @tparam A
@@ -160,12 +165,54 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
     }
 
     it("init method should return new list containing every element except the last") {
-      val xs = List(1,2,3,4)
-      xs.init should equal(List(1,2,3))
+      val xs = List(1, 2, 3, 4)
+      xs.init should equal(List(1, 2, 3))
+    }
+
+  }
+
+  describe("product2 should") {
+
+    val xs1 = List(1D, 2D, 3D, 4D)
+
+    it("compute the product correctly for lists with non-zero elements") {
+      product2(xs1) should equal(24D)
+    }
+
+    it("return 0 for lists with one or more zero elements") {
+      val xs2 = Cons(0D, xs1)
+      val xs3 = Cons(0D, xs2)
+      product2(xs2) should equal(0D)
+      product2(xs3) should equal(0D)
+    }
+
+    it("return 1 for empty lists") {
+      product2(Nil) should equal(1D)
+    }
+
+  }
+
+  describe("product2ShortCircuit should") {
+
+    val xs1 = List(1D, 2D, 3D, 4D)
+
+    it("compute the product correctly for lists with non-zero elements") {
+      product2ShortCircuit(xs1) should equal((24D, 4))
+    }
+
+    it("short circuit and exit when reaching the first zero") {
+      val withZero1 = List(1D, 2D, 3D, 0D, 4D)
+      product2ShortCircuit(withZero1) should equal((0D, 4))
+      val withZero2 = List(1D, 2D, 3D, 4D, 0D)
+      product2ShortCircuit(withZero2) should equal((0D, 5))
+      val withZero3 = List(0D, 2D, 3D, 4D, 0D)
+      product2ShortCircuit(withZero3) should equal((0D, 1))
     }
 
   }
 
 }
+
+
 
 

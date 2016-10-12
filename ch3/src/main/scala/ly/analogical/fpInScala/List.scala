@@ -101,6 +101,21 @@ sealed trait List[+A] {
     loop(this, Nil)
   }
 
+  def foldRight[B](z: B)(f: (A, B) => B): B = this match {
+    case Nil => z
+    case Cons(h, t) => t.foldRight(f(h, z))(f)
+  }
+
+  def foldRightShortCircuit[B](z: B)(f: (A, B) => B)(shortCircuit: A => Boolean)(shortCircuitDefault: B): (B, Int) = {
+    @tailrec
+    def loop(xs: List[A], acc: B, i: Int = 0): (B, Int) = xs match {
+      case Nil => (acc, i)
+      case Cons(h, t) if shortCircuit(h) => (shortCircuitDefault, i + 1)
+      case Cons(h, t) => loop(t, f(h, acc), i + 1)
+    }
+    loop(this, z)
+  }
+
 }
 
 case object Nil extends List[Nothing]
@@ -122,6 +137,17 @@ object List {
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
   }
+
+  /**
+    * Ex 3.7
+    * Can product, implemented using foldRight, immediately halt the recursion and return 0.0 if it encounters a 0.0?
+    * Why or why not?
+    * Consider how any short-circuiting might work if you call foldRight with a large list.
+    * This is a deeper question that we’ll return to in chapter 5.
+    */
+
+  def product2(xs: List[Double]): Double = xs.foldRight(1.0D)(_ * _)
+  def product2ShortCircuit(xs: List[Double]): (Double, Int) = xs.foldRightShortCircuit(1.0D)(_ * _)(_ == 0D)(0D)
 
 }
 
