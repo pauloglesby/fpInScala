@@ -81,7 +81,7 @@ sealed trait List[+A] {
     *   2. our recursion stops when we match on a Nil...i.e. at the end of the List. Recursing back from there with appends (all we have) means we reverse the original list...
     *   ... so we need to reverse it again before returning the result!
     *
-    * reverse is probably useful in many situations because of this directional bias, so move it to the base object!
+    * reverse is probably useful in many situations because of this directional bias, so move it to the trait
     */
   def init: List[A] = {
     @tailrec
@@ -90,7 +90,16 @@ sealed trait List[+A] {
       case Nil => acc
       case Cons(h, _) => loop(ys.tail, Cons(h, acc))
     }
-    reverse(loop(this))
+    loop(this).reverse
+  }
+
+  def reverse: List[A] = {
+    @tailrec
+    def loop[A](xs: List[A], acc: List[A] = Nil): List[A] = xs match {
+      case Cons(h, _) => loop(xs.tail, Cons(h, acc))
+      case _ => acc
+    }
+    loop(this, Nil)
   }
 
 }
@@ -113,12 +122,6 @@ object List {
   def apply[A](as: A*): List[A] = {
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
-  }
-
-  @tailrec
-  def reverse[A](xs: List[A], acc: List[A] = Nil): List[A] = xs match {
-    case Cons(h, _) => reverse(xs.tail, Cons(h, acc))
-    case _ => acc
   }
 
 }
