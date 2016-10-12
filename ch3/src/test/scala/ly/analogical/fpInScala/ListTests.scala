@@ -159,6 +159,11 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
       }
     }
 
+    it("init method should return new list containing every element except the last") {
+      val xs = List(1,2,3,4)
+      xs.init should equal(List(1,2,3))
+    }
+
   }
 
 }

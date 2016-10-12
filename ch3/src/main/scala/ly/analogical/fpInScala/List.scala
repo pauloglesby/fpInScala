@@ -8,6 +8,8 @@ import scala.annotation.tailrec
   */
 sealed trait List[+A] {
 
+  import List._
+
   /**
     * Ex 3.2
     * Implement the function `tail` for removing the first element of a list. Note that the function takes constant time.
@@ -68,6 +70,29 @@ sealed trait List[+A] {
     loop(this, Nil)
   }
 
+  /**
+    * Ex 3.6
+    * Not everything works out so nicely. Implement a function, init, that returns a List consisting of all but the last element of a List.
+    * So, given List(1,2,3,4), init will return List(1,2,3).
+    * Why can’t this function be implemented in constant time like tail?
+    *
+    * ... this one is interesting! 2 things show up immediately from writing the code:
+    *   1. the append-bias implementation of the List data structure jumps out! It is easy to append to a List, but this method needs us to recurse through it
+    *   2. our recursion stops when we match on a Nil...i.e. at the end of the List. Recursing back from there with appends (all we have) means we reverse the original list...
+    *   ... so we need to reverse it again before returning the result!
+    *
+    * reverse is probably useful in many situations because of this directional bias, so move it to the base object!
+    */
+  def init: List[A] = {
+    @tailrec
+    def loop(ys: List[A], acc: List[A] = Nil): List[A] = ys match {
+      case Cons(h, Nil) => acc
+      case Nil => acc
+      case Cons(h, _) => loop(ys.tail, Cons(h, acc))
+    }
+    reverse(loop(this))
+  }
+
 }
 
 case object Nil extends List[Nothing]
@@ -88,6 +113,12 @@ object List {
   def apply[A](as: A*): List[A] = {
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
+  }
+
+  @tailrec
+  def reverse[A](xs: List[A], acc: List[A] = Nil): List[A] = xs match {
+    case Cons(h, _) => reverse(xs.tail, Cons(h, acc))
+    case _ => acc
   }
 
 }
