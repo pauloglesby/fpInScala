@@ -86,9 +86,8 @@ sealed trait List[+A] {
   def init: List[A] = {
     @tailrec
     def loop(ys: List[A], acc: List[A] = Nil): List[A] = ys match {
-      case Cons(h, Nil) => acc
-      case Nil => acc
-      case Cons(h, _) => loop(ys.tail, Cons(h, acc))
+      case Cons(h, Cons(_, _)) => loop(ys.tail, Cons(h, acc))
+      case _ => acc
     }
     loop(this).reverse
   }
