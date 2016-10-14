@@ -81,16 +81,39 @@ sealed trait List[+A] {
     *   2. our recursion stops when we match on a Nil...i.e. at the end of the List. Recursing back from there with appends (all we have) means we reverse the original list...
     *   ... so we need to reverse it again before returning the result!
     *
-    * reverse is probably useful in many situations because of this directional bias, so move it to the base object!
+    * reverse is probably useful in many situations because of this directional bias, so move it to the trait
     */
   def init: List[A] = {
     @tailrec
     def loop(ys: List[A], acc: List[A] = Nil): List[A] = ys match {
-      case Cons(h, Nil) => acc
-      case Nil => acc
-      case Cons(h, _) => loop(ys.tail, Cons(h, acc))
+      case Cons(h, Cons(_, _)) => loop(ys.tail, Cons(h, acc))
+      case _ => acc
     }
-    reverse(loop(this))
+    loop(this).reverse
+  }
+
+  def reverse: List[A] = {
+    @tailrec
+    def loop[A](xs: List[A], acc: List[A] = Nil): List[A] = xs match {
+      case Cons(h, _) => loop(xs.tail, Cons(h, acc))
+      case _ => acc
+    }
+    loop(this, Nil)
+  }
+
+  def foldRight[B](z: B)(f: (A, B) => B): B = this match {
+    case Nil => z
+    case Cons(h, t) => t.foldRight(f(h, z))(f)
+  }
+
+  def foldRightShortCircuit[B](z: B)(f: (A, B) => B)(shortCircuit: A => Boolean)(shortCircuitDefault: B): (B, Int) = {
+    @tailrec
+    def loop(xs: List[A], acc: B, i: Int = 0): (B, Int) = xs match {
+      case Nil => (acc, i)
+      case Cons(h, t) if shortCircuit(h) => (shortCircuitDefault, i + 1)
+      case Cons(h, t) => loop(t, f(h, acc), i + 1)
+    }
+    loop(this, z)
   }
 
 }
@@ -115,11 +138,16 @@ object List {
     else Cons(as.head, apply(as.tail: _*))
   }
 
-  @tailrec
-  def reverse[A](xs: List[A], acc: List[A] = Nil): List[A] = xs match {
-    case Cons(h, _) => reverse(xs.tail, Cons(h, acc))
-    case _ => acc
-  }
+  /**
+    * Ex 3.7
+    * Can product, implemented using foldRight, immediately halt the recursion and return 0.0 if it encounters a 0.0?
+    * Why or why not?
+    * Consider how any short-circuiting might work if you call foldRight with a large list.
+    * This is a deeper question that we’ll return to in chapter 5.
+    */
+
+  def product2(xs: List[Double]): Double = xs.foldRight(1.0D)(_ * _)
+  def product2ShortCircuit(xs: List[Double]): (Double, Int) = xs.foldRightShortCircuit(1.0D)(_ * _)(_ == 0D)(0D)
 
 }
 
