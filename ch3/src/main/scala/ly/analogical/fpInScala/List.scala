@@ -116,6 +116,13 @@ sealed trait List[+A] {
     loop(this, z)
   }
 
+  /**
+    * Ex 3.9
+    * Compute the length of a list using foldRight
+    */
+
+  def length: Int = foldRight(0)((e, l) => l + 1)
+
 }
 
 case object Nil extends List[Nothing]
