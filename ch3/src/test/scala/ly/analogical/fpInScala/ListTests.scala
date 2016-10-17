@@ -211,6 +211,21 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("length with foldRight should") {
+
+    it("return zero for an empty list") {
+      Nil.length should equal(0)
+    }
+
+    it("return the correct length as the number of non-Nil elements") {
+      forAll(genInts) { listSize =>
+        val xs = genList(listSize)
+        xs.length should equal(listSize)
+      }
+    }
+
+  }
+
 }
 
 
