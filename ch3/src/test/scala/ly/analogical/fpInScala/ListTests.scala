@@ -226,6 +226,69 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("sumFoldLeft should") {
+
+    it("return 0 for an empty list") {
+      sumFoldLeft(Nil) should equal(0)
+    }
+
+    it("return the correct sum of elements for a non-empty list") {
+      val xs1 = List(1)
+      sumFoldLeft(xs1) should equal(1)
+      val xs2 = List(1, 2, 3, 4)
+      sumFoldLeft(xs2) should equal(10)
+    }
+
+  }
+
+  describe("productFoldLeft should") {
+
+    it("return 1 for an empty list") {
+      productFoldLeft(Nil) should equal(1D)
+    }
+
+    it("return 0 for any list with a zero element") {
+      val xs1 = List(0D)
+      productFoldLeft(xs1) should equal(0D)
+      val xs2 = List(1D, 2D, 0D, 4D)
+      productFoldLeft(xs2) should equal(0D)
+    }
+
+    it("return the correct product of elements for a non-empty list") {
+      val xs1 = List(2D)
+      productFoldLeft(xs1) should equal(2D)
+      val xs2 = List(1D, 2D, 3D, 4D)
+      productFoldLeft(xs2) should equal(24D)
+    }
+
+  }
+
+  describe("lengthFoldLeft should") {
+
+    it("return 0 for an empty list") {
+      lengthFoldLeft(Nil) should equal(0)
+    }
+
+    it("return the correct length as the number of non-Nil elements") {
+      forAll(genInts) { listSize =>
+        val xs = genList(listSize)
+        lengthFoldLeft(xs) should equal(listSize)
+      }
+    }
+
+  }
+
+  describe("reverse2 should") {
+
+    it("be the same as reverse") {
+      forAll(genInts) { listSize =>
+        val xs = genList(listSize)
+        xs.reverse should equal(xs.reverse2)
+      }
+    }
+
+  }
+
 }
 
 

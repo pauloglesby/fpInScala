@@ -8,8 +8,6 @@ import scala.annotation.tailrec
   */
 sealed trait List[+A] {
 
-  import List._
-
   /**
     * Ex 3.2
     * Implement the function `tail` for removing the first element of a list. Note that the function takes constant time.
@@ -120,8 +118,30 @@ sealed trait List[+A] {
     * Ex 3.9
     * Compute the length of a list using foldRight
     */
-
   def length: Int = foldRight(0)((e, l) => l + 1)
+
+  /**
+    * Ex 3.10
+    * Our implementation of foldRight is not tail-recursive and will result in a StackOverflowError for large lists (we say it’s not stack-safe).
+    * Convince yourself that this is the case, and then write another general list-recursion function, foldLeft,
+    * that is tail-recursive, using the techniques we discussed in the previous chapter.
+    *
+    * NB: the difference between this implementation and the one given in the solution is because we've put the method onto the List instance.
+    * The inner loop here is equivalent to the solution `foldLeft`; we've just wrapped it to consume `this`.
+    */
+  def foldLeft[B](z: B)(f: (B, A) => B): B = {
+    @tailrec
+    def loop(xs: List[A], acc: B): B = xs match {
+      case Nil => acc
+      case Cons(h, t) => loop(t, f(acc, h))
+    }
+    loop(this, z)
+  }
+
+  /**
+    * Ex 3.12 write a function to reverse a list using a `fold`.
+    */
+  def reverse2: List[A] = foldLeft[List[A]](Nil) { case (acc, h) => Cons(h, acc) }
 
 }
 
@@ -151,10 +171,26 @@ object List {
     * Why or why not?
     * Consider how any short-circuiting might work if you call foldRight with a large list.
     * This is a deeper question that we’ll return to in chapter 5.
+    *
+    * Strictly speaking, our solution above is not using the same foldRight! We just implemented a different tail-recursive fold,
+    * which defeats the point of this exercise(but is not bad programming).
+    *
+    * Trying to do this with the original implementation will lead to stack overflows. Keep drilling why - do it by expanding function
+    * calls on paper...
+    *
     */
 
   def product2(xs: List[Double]): Double = xs.foldRight(1.0D)(_ * _)
   def product2ShortCircuit(xs: List[Double]): (Double, Int) = xs.foldRightShortCircuit(1.0D)(_ * _)(_ == 0D)(0D)
+
+  /**
+    * Ex 3.11
+    * Write sum, product, and a function to compute the length of a list using foldLeft.
+    */
+
+  def sumFoldLeft(xs: List[Int]): Int = xs.foldLeft(0)(_ + _)
+  def productFoldLeft(xs: List[Double]): Double = xs.foldLeft(1D)(_ * _)
+  def lengthFoldLeft(xs: List[_]): Int = xs.foldLeft(0)((l, _) => l + 1)
 
 }
 
