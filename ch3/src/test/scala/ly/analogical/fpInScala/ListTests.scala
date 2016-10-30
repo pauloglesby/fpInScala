@@ -289,6 +289,56 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("append should") {
+
+    it("add an element to the end of a list") {
+      val xs1 = List(1, 2, 3)
+      val xs2 = List(1, 2, 3, 4)
+      xs1.append(4) should equal(xs2)
+    }
+
+  }
+
+  describe("concat should") {
+
+    val xs1 = List(1, 2, 3)
+    val xs2 = List(4, 5, 6)
+    val all = List(1, 2, 3, 4, 5, 6)
+
+    it("return the empty list if only one input of empty list is given") {
+      concat(List(Nil)) should equal(Nil)
+    }
+
+    it("return the input non-empty list if only one input of non-empty list is given") {
+      concat(List(xs1)) should equal(xs1)
+    }
+
+    it("concatenate a non-empty list with the empty list and return the non-empty list") {
+      concat(List(xs1, Nil)) should equal(xs1)
+    }
+
+    it("concatenate an empty list with a non-empty list and return the non-empty list") {
+      concat(List(Nil, xs1)) should equal(xs1)
+
+    }
+    it("concatenate two non-empty lists") {
+      concat(List(xs1, xs2)) should equal(all)
+    }
+
+    it("concatenate two non-empty lists and one empty list") {
+      concat(List(xs1, xs2, Nil)) should equal(all)
+    }
+
+    it("concatenate one non-empty list, one empty list, and one non-empty list") {
+      concat(List(xs1, Nil, xs2)) should equal(all)
+    }
+
+    it("concatenate one empty list and two non-empty lists") {
+      concat(List(Nil, xs1, xs2)) should equal(all)
+    }
+
+  }
+
 }
 
 

@@ -101,7 +101,7 @@ sealed trait List[+A] {
 
   def foldRight[B](z: B)(f: (A, B) => B): B = this match {
     case Nil => z
-    case Cons(h, t) => t.foldRight(f(h, z))(f)
+    case Cons(h, t) => f(h, this.tail.foldRight(z)(f))
   }
 
   def foldRightShortCircuit[B](z: B)(f: (A, B) => B)(shortCircuit: A => Boolean)(shortCircuitDefault: B): (B, Int) = {
@@ -141,7 +141,24 @@ sealed trait List[+A] {
   /**
     * Ex 3.12 write a function to reverse a list using a `fold`.
     */
-  def reverse2: List[A] = foldLeft[List[A]](Nil) { case (acc, h) => Cons(h, acc) }
+  def reverse2: List[A] = foldLeft[List[A]](Nil)((acc, h) => Cons(h, acc))
+
+  /**
+    * Ex 3.13 (Hard)
+    * Can you write foldLeft in terms of foldRight? How about the other way around?
+    *
+    * Implementing foldRight in terms of foldLeft is useful because it lets us implement foldRight tail-recursively.
+    *
+    */
+
+  def foldRight2[B](z: B)(f: (A, B) => B): B = this.reverse2.foldLeft(z)((acc, h) => f(h, acc))
+
+  /**
+    * Ex 3.14
+    * Implement append in terms of either foldLeft or foldRight
+    *
+    */
+  def append[B >: A](b: B): List[B] = foldRight2(Cons(b, Nil))((h, acc) => Cons(h, acc))
 
 }
 
@@ -191,6 +208,25 @@ object List {
   def sumFoldLeft(xs: List[Int]): Int = xs.foldLeft(0)(_ + _)
   def productFoldLeft(xs: List[Double]): Double = xs.foldLeft(1D)(_ * _)
   def lengthFoldLeft(xs: List[_]): Int = xs.foldLeft(0)((l, _) => l + 1)
+
+  /**
+    * Ex 3.15 (Hard)
+    *
+    * Write a function that takes a list of lists and concatenates them into a single list.
+    * Its runtime should be linear in the length of the input lists. Try to use functions we have already defined.
+    */
+
+  def concat[A](listOfLists: List[List[A]]): List[A] = {
+    @tailrec
+    def loop(list: List[A], lists: List[List[A]]): List[A] = lists match {
+      case Nil => list
+      case Cons(xs, listXs) => loop(xs.foldLeft(list)((ys, y) => ys.append(y)), listXs)
+    }
+    listOfLists match {
+      case Cons(list, lists) => loop(list, lists)
+      case _ => Nil
+    }
+  }
 
 }
 
