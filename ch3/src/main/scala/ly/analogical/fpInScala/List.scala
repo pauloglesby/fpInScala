@@ -141,7 +141,7 @@ sealed trait List[+A] {
   /**
     * Ex 3.12 write a function to reverse a list using a `fold`.
     */
-  def reverse2: List[A] = foldLeft[List[A]](Nil) { case (acc, h) => Cons(h, acc) }
+  def reverse2: List[A] = foldLeft[List[A]](Nil)((acc, h) => Cons(h, acc))
 
 }
 
