@@ -101,7 +101,7 @@ sealed trait List[+A] {
 
   def foldRight[B](z: B)(f: (A, B) => B): B = this match {
     case Nil => z
-    case Cons(h, t) => t.foldRight(f(h, z))(f)
+    case Cons(h, t) => f(h, this.tail.foldRight(z)(f))
   }
 
   def foldRightShortCircuit[B](z: B)(f: (A, B) => B)(shortCircuit: A => Boolean)(shortCircuitDefault: B): (B, Int) = {
