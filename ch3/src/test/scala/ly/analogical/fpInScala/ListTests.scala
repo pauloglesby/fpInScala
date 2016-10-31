@@ -339,8 +339,66 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("increment should") {
+
+    it("return the empty list if the input is the empty list") {
+      increment(Nil) should equal(Nil)
+    }
+
+    it("return a new list of integers with each element incremented by 1") {
+      val xs = List(1, 2, 3)
+      increment(xs) should equal(List(2, 3, 4))
+    }
+
+  }
+
+  describe("doublesAsStrings should") {
+
+    it("return the empty list if the input is the empty list") {
+      doublesAsStrings(Nil) should equal(Nil)
+    }
+
+    it("return a new list of integers with each element incremented by 1") {
+      val xs = List(1D, 2D, 3D)
+      doublesAsStrings(xs) should equal(List("1.0", "2.0", "3.0"))
+    }
+
+  }
+
+  describe("map should") {
+
+    it("be equivalent to increment when passed the function _ + 1") {
+      val xs = List(1, 2, 3)
+      xs.map(_ + 1) should equal(increment(xs))
+    }
+
+    it("be equivalent to doublesAsStrings when passed the function _.toString") {
+      val xs = List(1D, 2D, 3D)
+      xs.map(_.toString) should equal(doublesAsStrings(xs))
+    }
+
+  }
+
+  describe("filter should") {
+
+    val xs = List(1, 2, 3, 4)
+
+    it("remove odd elements from a list of ints when passed _ % 2 == 0") {
+      xs.filter(_ % 2 == 0) should equal(List(2, 4))
+    }
+
+    it("return an empty list if no elements satisfy the predicate") {
+      xs.filter(_ % 5 == 0) should equal(Nil)
+    }
+
+  }
+
+  describe("flatMap should") {
+
+    it("return List(1, 1, 2, 2, 3, 3) when passed i => List(i, i) and called on List(1, 2, 3)") {
+      List(1, 2, 3).flatMap(x => List(x, x)) should equal(List(1, 1, 2, 2, 3, 3))
+    }
+
+  }
+
 }
-
-
-
-
