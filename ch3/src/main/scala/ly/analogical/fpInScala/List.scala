@@ -160,6 +160,29 @@ sealed trait List[+A] {
     */
   def append[B >: A](b: B): List[B] = foldRight2(Cons(b, Nil))((h, acc) => Cons(h, acc))
 
+  /**
+    * Ex 3.18
+    * Write a function `map` that generalizes modifying each element whilst retaining the structure of the list.
+    * See also `increment` and `doublesAsStrings`, below.
+    */
+  def map[B](f: A => B): List[B] = foldLeft[List[B]](Nil)((xs, x) => xs.append(f(x)))
+
+  /**
+    * Ex 3.19
+    * Write a function filter that removes elements from a list unless they satisfy a given predicate.
+    * Use it to remove all odd numbers from a List[Int]
+    */
+  def filter(f: A => Boolean): List[A] = foldLeft[List[A]](Nil)((xs, x) => if (f(x)) xs.append(x) else xs)
+
+  /**
+    * Ex 3.20
+    * Write a function flatMap that works like map except that the function given will return a list
+    * instead of a single result, and that list should be inserted into the final resulting list.
+    * For instance, List(1,2,3).flatMap(i => List(i,i)) should result in  List(1,1,2,2,3,3).
+    */
+  def flatMap[B >: A](f: A => List[B]): List[B] = foldLeft[List[B]](Nil)((xs, x) => f(x).foldLeft(xs)(_.append(_)))
+
+
 }
 
 case object Nil extends List[Nothing]
@@ -227,6 +250,19 @@ object List {
       case _ => Nil
     }
   }
+
+  /**
+    * Ex 3.16
+    * Write a function that transforms a list of integers by adding 1 to each element.
+    * (Reminder: this should be a pure function that returns a new List!)
+    */
+  def increment(xs: List[Int]): List[Int] = xs.foldLeft[List[Int]](Nil)((ys, y) => ys.append(y + 1))
+
+  /**
+    * Ex 3.17
+    * Write a function that turns each value in a List[Double] into a String.
+    */
+  def doublesAsStrings(xs: List[Double]): List[String] = xs.foldLeft[List[String]](Nil)((ys, y) => ys.append(y.toString))
 
 }
 
