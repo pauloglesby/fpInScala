@@ -182,6 +182,11 @@ sealed trait List[+A] {
     */
   def flatMap[B >: A](f: A => List[B]): List[B] = foldLeft[List[B]](Nil)((xs, x) => f(x).foldLeft(xs)(_.append(_)))
 
+  /**
+    * Ex 3.21
+    * Use flatMap to implement filter
+    */
+  def filter2(f: A => Boolean): List[A] = flatMap(a => if (f(a)) List(a) else Nil)
 
 }
 

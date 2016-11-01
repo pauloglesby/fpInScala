@@ -401,4 +401,18 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("filter2 should") {
+
+    val xs = List(1, 2, 3, 4)
+
+    it("remove odd elements from a list of ints when passed _ % 2 == 0") {
+      xs.filter2(_ % 2 == 0) should equal(List(2, 4))
+    }
+
+    it("return an empty list if no elements satisfy the predicate") {
+      xs.filter2(_ % 5 == 0) should equal(Nil)
+    }
+
+  }
+
 }
