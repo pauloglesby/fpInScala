@@ -205,6 +205,34 @@ sealed trait List[+A] {
     loop(this, xs2, Nil)
   }
 
+  /**
+    * Ex 3.24 (Hard)
+    * Hard: As an example, implement hasSubsequence for checking whether a List contains another List as a subsequence.
+    * For instance, List(1,2,3,4) would have List(1,2), List(2,3), and List(4) as subsequences, among others.
+    * You may have some difficulty finding a concise purely functional implementation that is also efficient.
+    * That’s okay. Implement the function however comes most naturally.
+    * We’ll return to this implementation in chapter 5 and hopefully improve on it.
+    */
+  def hasSubsequence[B >: A](xs: List[B]): Boolean = {
+    val comparisonsRequired = xs.length
+    @tailrec
+    def loop(xs1: List[A], xs2: List[B], comparisonsRemaining: Int = comparisonsRequired): Boolean = xs2 match {
+      case Nil => if (comparisonsRemaining == 0) true else loop(xs1, xs)
+      case Cons(h2, t2) => xs1 match {
+        case Nil => false // we haven't exhausted the subsequence yet, so return with just false
+        case Cons(h1, t1) => {
+          if (h1 == h2) loop(t1, t2, comparisonsRemaining - 1)                // compare the next element in both lists
+          else if (comparisonsRemaining < comparisonsRequired) loop(xs1, xs)  // in a partial match, so h1 needs to be reset onto the fresh stack
+          else loop(t1, xs)                                                   // not in a partial match, so discard h1
+        }
+      }
+    }
+    xs match {
+      case Nil => false
+      case _ => loop(this, xs)
+    }
+  }
+
 }
 
 case object Nil extends List[Nothing]
