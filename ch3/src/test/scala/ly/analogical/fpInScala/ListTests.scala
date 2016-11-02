@@ -415,4 +415,44 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("combine should") {
+
+    it("output a List structure corresponding to the size of the first input") {
+      combine(List(1, 2), List(1, 2, 3)).length should equal(2)
+      combine(Nil, List(1, 2)).length should equal(0)
+      combine(List(1, 2, 3), List(1, 2)).length should equal(3)
+    }
+
+    it("add the position-wise elements of input lists together to create the output") {
+      combine(List(1, 2), List(1, 2, 3)) should equal(List(2, 4))
+      combine(List(1, 2, 3), List(4, 5, 6)) should equal(List(5, 7, 9))
+      combine(List(1, 2, 3), Nil) should equal(List(1, 2, 3))
+      combine(Nil, List(1, 2, 3)) should equal(Nil)
+      combine(List(1, 2, 3), List(-1, -2, -3, -4)) should equal(List(0, 0, 0))
+    }
+
+  }
+
+  describe("zipWith should") {
+
+    it("be equivalent to combine when called with (a, b) => a + b and default = 0") {
+      val d = 0
+      val f: (Int, Int) => Int = _ + _
+      List(1, 2).zipWith(List(1, 2, 3))(f)(d) should equal(List(2, 4))
+      Nil.zipWith(List(1, 2, 3))(f)(d) should equal(Nil)
+      List(1, 2, 3).zipWith(List(1, 2))(f)(d) should equal(List(2, 4, 3))
+      List(1, 2).zipWith(Nil)(f)(d) should equal(List(1, 2))
+    }
+
+    it("multiply pairwise elements of input lists and retain structure of first list when called with (a, b) => a * b and default = 1") {
+      val d = 1
+      val f: (Int, Int) => Int = _ * _
+      List(1, 2).zipWith(List(1, 2, 3))(f)(d) should equal(List(1, 4))
+      Nil.zipWith(List(1, 2, 3))(f)(d) should equal(Nil)
+      List(1, 2, 3).zipWith(List(1, 2))(f)(d) should equal(List(1, 4, 3))
+      List(1, 2).zipWith(Nil)(f)(d) should equal(List(1, 2))
+    }
+
+  }
+
 }

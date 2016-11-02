@@ -188,6 +188,23 @@ sealed trait List[+A] {
     */
   def filter2(f: A => Boolean): List[A] = flatMap(a => if (f(a)) List(a) else Nil)
 
+  /**
+    * Ex 3.23
+    * Generalize `combine` so that it’s not specific to integers or addition. Name your generalized function zipWith.
+    */
+  def zipWith[B >: A, C](xs2: List[B])(f: (A, B) => C)(z: B): List[C] = {
+    @tailrec
+    def loop(xs: List[A], ys: List[B], acc: List[C]): List[C] = xs match {
+      case Nil => acc
+      case Cons(x, tx) =>
+        ys match {
+          case Cons(y, ty) => loop(tx, ty, acc.append(f(x, y)))
+          case Nil => loop(tx, Nil, acc.append(f(x, z)))
+        }
+    }
+    loop(this, xs2, Nil)
+  }
+
 }
 
 case object Nil extends List[Nothing]
@@ -268,6 +285,26 @@ object List {
     * Write a function that turns each value in a List[Double] into a String.
     */
   def doublesAsStrings(xs: List[Double]): List[String] = xs.foldLeft[List[String]](Nil)((ys, y) => ys.append(y.toString))
+
+  /**
+    * Ex 3.22
+    * Write a function that accepts two lists and constructs a new list by adding corresponding elements.
+    * For example, List(1,2,3) and List(4,5,6) become List(5,7,9).
+    */
+  def combine(xs1: List[Int], xs2: List[Int]): List[Int] = {
+    @tailrec
+    def loop(xs: List[Int], ys: List[Int], acc: List[Int]): List[Int] = xs match {
+      case Nil => acc
+      case Cons(x, tx) =>
+        ys match {
+          case Cons(y, ty) => loop(tx, ty, acc.append(x + y))
+          case Nil => loop(tx, Nil, acc.append(x))
+        }
+    }
+    loop(xs1, xs2, Nil)
+  }
+
+  def combine1(xs1: List[Int], xs2: List[Int]): List[Int] = xs1.zipWith(xs2)(_ + _)(0)
 
 }
 
