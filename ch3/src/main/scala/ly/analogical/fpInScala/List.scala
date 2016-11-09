@@ -75,8 +75,8 @@ sealed trait List[+A] {
     * Why can’t this function be implemented in constant time like tail?
     *
     * ... this one is interesting! 2 things show up immediately from writing the code:
-    *   1. the append-bias implementation of the List data structure jumps out! It is easy to append to a List, but this method needs us to recurse through it
-    *   2. our recursion stops when we match on a Nil...i.e. at the end of the List. Recursing back from there with appends (all we have) means we reverse the original list...
+    *   1. the prepend-bias implementation of the List data structure jumps out! It is easy to prepend to a List, but this method needs us to recurse through it
+    *   2. our recursion stops when we match on a Nil...i.e. at the end of the List. Recursing back from there with prepends (all we have) means we reverse the original list...
     *   ... so we need to reverse it again before returning the result!
     *
     * reverse is probably useful in many situations because of this directional bias, so move it to the trait
