@@ -455,4 +455,60 @@ class ListTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("hasSubsequence should") {
+
+    /**
+      * Adopt a more unit-focussed (rather than behaviour) testing approach here -
+      * this method involves some algorithmic edge cases!
+      */
+
+    val xs = List(1, 2, 3)
+
+    it("return false when passed Nil") {
+      forAll(genInts) { n =>
+        genList(n).hasSubsequence(Nil) should equal(false)
+      }
+    }
+
+    it("return false when called on Nil") {
+      forAll(genInts) { n =>
+        Nil.hasSubsequence(genList(n)) should equal(false)
+      }
+    }
+
+    it("return false when the subsequence is not completely matched before the list is exhausted") {
+      xs.hasSubsequence(List(2, 3, 4)) should equal(false)
+      xs.hasSubsequence(List(3, 4)) should equal(false)
+    }
+
+    it("return false when the subsequence is only partially matched") {
+      xs.hasSubsequence(List(1, 3)) should equal(false)
+      xs.hasSubsequence(List(3, 1)) should equal(false)
+    }
+
+    it("return false when the subsequence is completely unmatched") {
+      xs.hasSubsequence(List(4, 5)) should equal(false)
+    }
+
+    it("return true if the subsequence is a subsequence") {
+      xs.hasSubsequence(List(1)) should equal(true)
+      xs.hasSubsequence(List(2)) should equal(true)
+      xs.hasSubsequence(List(3)) should equal(true)
+      xs.hasSubsequence(List(1, 2)) should equal(true)
+      xs.hasSubsequence(List(2, 3)) should equal(true)
+      xs.hasSubsequence(List(1, 2, 3)) should equal(true)
+    }
+
+    val ys = List(1, 2, 1, 2, 1, 1)
+
+    it("return false if a partial subsequence match follows a partial subsequence match") {
+      ys.hasSubsequence(List(2, 1, 1, 1)) should equal(false)
+    }
+
+    it("return true if a complete subsequence match follows a partial subsequence match") {
+      ys.hasSubsequence(List(2, 1, 1)) should equal(true)
+    }
+
+  }
+
 }
