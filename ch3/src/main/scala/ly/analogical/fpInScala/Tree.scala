@@ -36,6 +36,18 @@ sealed trait Tree[+A] {
     loop(List(this))
   }
 
+  /**
+    * Ex 3.28
+    * Write a function `map`, analogous to the `map` on `List`, that modifies each element of a `Tree` with a given function.
+    */
+  def map[B](f: A => B): Tree[B] = {
+    def loop(t: Tree[A]): Tree[B] = t match {
+      case Leaf(a) => Leaf(f(a))
+      case Branch(l, r) => Branch(loop(l), loop(r))
+    }
+    loop(this)
+  }
+
 }
 case class Leaf[A](value: A) extends Tree[A]
 case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]

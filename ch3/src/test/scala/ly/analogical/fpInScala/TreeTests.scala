@@ -70,4 +70,17 @@ class TreeTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("`map` should") {
+
+    it("transform single leaf element with provided function") {
+      leaf.map(_.toString) should equal(Leaf("1"))
+    }
+
+    it("preserve outer structure of tree") {
+      val tree = Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))
+      tree.map(_.toString) should equal(Branch(Branch(Leaf("1"), Leaf("2")), Branch(Leaf("3"), Leaf("4"))))
+    }
+
+  }
+
 }
