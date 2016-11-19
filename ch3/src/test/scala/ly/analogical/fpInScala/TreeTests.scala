@@ -1,11 +1,16 @@
 package ly.analogical.fpInScala
 
+import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 class TreeTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
+  import Tree._
+
   val leaf = Leaf(1)
   val branch = Branch(leaf, leaf)
+
+  def genLeaf = Gen.choose(Int.MinValue, Int.MaxValue).map(Leaf(_))
 
   describe("`size` should") {
 
@@ -24,6 +29,26 @@ class TreeTests extends BaseSpec with GeneratorDrivenPropertyChecks {
     it("return 5 for a tree: 1 branch with 1 leaf 1 child branch with 2 leaves") {
       Branch(branch, leaf).size should equal(5)
       Branch(leaf, branch).size should equal(5)
+    }
+
+  }
+
+  describe("`maximum` should") {
+
+    it("return the element value for a single leaf tree") {
+      forAll(genLeaf) { l =>
+        maximum(l) should equal(l.value)
+      }
+    }
+
+    it("return the largest element in a branch with 2 leaves") {
+      maximum(Branch(Leaf(-2), Leaf(-1))) should equal(-1)
+      maximum(Branch(Leaf(-1), Leaf(-2))) should equal(-1)
+    }
+
+    it("return the largest element in a multi branch tree") {
+      val tree = Branch(Branch(Branch(Leaf(1), Branch(Leaf(2), Leaf(3))), Branch(Leaf(4), Leaf(5))), Branch(Leaf(6), Leaf(7)))
+      maximum(tree) should equal(7)
     }
 
   }
