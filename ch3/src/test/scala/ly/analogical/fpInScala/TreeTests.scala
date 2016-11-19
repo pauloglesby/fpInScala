@@ -53,4 +53,21 @@ class TreeTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("`depth` should") {
+
+    it("return 0 for a single leaf tree") {
+      leaf.depth should equal(0)
+    }
+
+    it("return 1 for a single branch tree with 2 leaves") {
+      branch.depth should equal(1)
+    }
+
+    it("return 2 for a tree with two leaves at depth 2, and one leaf at depth 1") {
+      Branch(branch, leaf).depth should equal(2)
+      Branch(leaf, branch).depth should equal(2)
+    }
+
+  }
+
 }
