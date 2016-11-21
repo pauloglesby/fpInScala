@@ -48,6 +48,23 @@ sealed trait Tree[+A] {
     loop(this)
   }
 
+  /**
+    * Ex 3.29
+    * Generalize size, maximum, depth, and map, writing a new function fold that abstracts over their similarities.
+    * Reimplement them in terms of this more general function.
+    * Can you draw an analogy between this fold function and the left and right folds for List?
+    */
+  def fold[B](f: A => B)(g: (B, B) => B): B = {
+    def loop(t: Tree[A]): B = t match {
+      case Leaf(a) => f(a)
+      case Branch(l, r) => g(loop(l), loop(r))
+    }
+    loop(this)
+  }
+
+  def sizeViaFold: Int = this.fold(_ => 1)(1 + _ + _)
+  def depthViaFold: Int = this.fold(_ => 0)((d1, d2) => 1 + (d1 max d2))
+
 }
 case class Leaf[A](value: A) extends Tree[A]
 case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
@@ -69,5 +86,7 @@ object Tree {
     }
     loop(List(t))
   }
+
+  def maximumViaFold(t: Tree[Int]) = t.fold(_ => Integer.MIN_VALUE)(_ max _)
 
 }
