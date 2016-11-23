@@ -1,6 +1,12 @@
 package ly.analogical.fpInScala
 
-class OptionTests extends BaseSpec {
+import org.scalacheck.Gen
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+
+class OptionTests extends BaseSpec with GeneratorDrivenPropertyChecks {
+
+  import Option._
+  val genInts = Gen.choose(2, 100)
 
   describe("`map` should") {
 
@@ -62,6 +68,38 @@ class OptionTests extends BaseSpec {
 
     it("return `Some(x)` when called on `Some(x)` if `p(x) == true`") {
       Some(1).filter(_ == 1) should equal(Some(1))
+    }
+
+  }
+
+  describe("`mean` should") {
+
+    it("return `None` on an empty sequence") {
+      mean(Seq.empty[Double]) should equal(None)
+    }
+
+    it("return the arithmetic mean on a non-empty sequence") {
+      forAll(genInts) { n =>
+        // use mathematical facts about sums of consecutive sequences of integers from 1
+        val expected = (n.toDouble + 1) / 2
+        mean((1 to n).map(_.toDouble)) should equal(Some(expected))
+      }
+    }
+
+  }
+
+  describe("`variance` should") {
+
+    it("return `None` on an empty sequence") {
+      variance(Seq.empty[Double]) should equal(None)
+    }
+
+    it("return the variance on a non-empty sequence") {
+      forAll(genInts) { n =>
+        // use fact that variance of 3 consecutive integers should be 2/3
+        val expected = 2D / 3
+        variance((n to (n + 2)).map(_.toDouble)) should equal(Some(expected))
+      }
     }
 
   }

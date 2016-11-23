@@ -34,3 +34,15 @@ sealed trait Option[+A] {
 }
 case class Some[A](get: A) extends Option[A]
 case object None extends Option[Nothing]
+
+object Option {
+
+  /**
+    * Ex 4.2
+    * Implement the `variance` function in terms of a `flatMap` on a `Seq[Double]`
+    * If the `mean` of a sequence `xs` is `m`, the `variance` is the mean of `math.pow(x - m, 2)` for each element `x` of `xs`
+    */
+  def mean(xs: Seq[Double]): Option[Double] = if (xs.isEmpty) None else Some(xs.sum / xs.length)
+  def variance(xs: Seq[Double]): Option[Double] = mean(xs).flatMap(m => mean(xs.map(x => Math.pow(x - m, 2))))
+
+}
