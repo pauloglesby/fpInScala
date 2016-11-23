@@ -104,4 +104,24 @@ class OptionTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("`map2` should") {
+
+    it("return `None` if the first input is `None`") {
+      map2[Int, Int, Int](None, Some(1))(_ + _) should equal(None)
+    }
+
+    it("return `None` if the second input is `None`") {
+      map2[Int, Int, Int](Some(1), None)(_ + _) should equal(None)
+    }
+
+    it("return `None` if the both inputs are `None`") {
+      map2[Int, Int, Int](None, None)(_ + _) should equal(None)
+    }
+
+    it("return a `Some` of the mapped input values if both inputs are `Some(_)`") {
+      map2[Int, Int, Int](Some(1), Some(1))(_ + _) should equal(Some(2))
+    }
+
+  }
+
 }

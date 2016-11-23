@@ -45,4 +45,11 @@ object Option {
   def mean(xs: Seq[Double]): Option[Double] = if (xs.isEmpty) None else Some(xs.sum / xs.length)
   def variance(xs: Seq[Double]): Option[Double] = mean(xs).flatMap(m => mean(xs.map(x => Math.pow(x - m, 2))))
 
+  /**
+    * Ex 4.3
+    * Write a generic function, `map2`, that combines two `Option` values using a binary function. If either `Option` is
+    * `None`, then `map2` returns `None`.
+    */
+  def map2[A, B, C](oa: Option[A], ob: Option[B])(f: (A, B) => C): Option[C] = oa.flatMap(a => ob.map(b => f(a, b)))
+
 }
