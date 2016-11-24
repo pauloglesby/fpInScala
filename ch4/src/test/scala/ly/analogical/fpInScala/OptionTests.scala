@@ -124,4 +124,18 @@ class OptionTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("`sequence` should") {
+
+    it("return `None` if any input element is `None`") {
+      sequence(List(Some(1), None)) should equal(None)
+      sequence(List(None, Some(1))) should equal(None)
+      sequence(List(None, None)) should equal(None)
+    }
+
+    it("return `Some(List(_))` if all the input elements are `Some(_)`") {
+      sequence(List(Some(1), Some(2), Some(3))) should equal(Some(List(1, 2, 3)))
+    }
+
+  }
+
 }

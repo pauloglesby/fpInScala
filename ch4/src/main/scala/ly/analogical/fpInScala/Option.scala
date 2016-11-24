@@ -1,5 +1,7 @@
 package ly.analogical.fpInScala
 
+import scala.annotation.tailrec
+
 sealed trait Option[+A] {
 
   /**
@@ -51,5 +53,17 @@ object Option {
     * `None`, then `map2` returns `None`.
     */
   def map2[A, B, C](oa: Option[A], ob: Option[B])(f: (A, B) => C): Option[C] = oa.flatMap(a => ob.map(b => f(a, b)))
+
+  /**
+    * Ex 4.4
+    * Write a function sequence that combines a list of Options into one Option containing a list of all the Some values in the original list.
+    * If the original list contains None even once, the result of the function should be None;
+    * otherwise the result should be Some with a list of all the values.
+    */
+  def sequence[A](as: List[Option[A]]): Option[List[A]] = as match {
+    case h :: t => h.flatMap(a => sequence(t).map(a :: _))
+    case Nil => Some(Nil)
+  }
+  }
 
 }
