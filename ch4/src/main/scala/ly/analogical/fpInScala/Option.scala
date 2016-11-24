@@ -64,6 +64,14 @@ object Option {
     case h :: t => h.flatMap(a => sequence(t).map(a :: _))
     case Nil => Some(Nil)
   }
+
+  /**
+    * Ex 4.5
+    * Implement `traverse`, that combines map and sequence into a single pass over a list
+    */
+  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = as match {
+    case h :: t => map2(f(h), traverse(t)(f))(_ :: _)
+    case Nil => Some(Nil)
   }
 
 }

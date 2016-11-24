@@ -138,4 +138,21 @@ class OptionTests extends BaseSpec with GeneratorDrivenPropertyChecks {
 
   }
 
+  describe("`traverse` should") {
+
+    val f: Int => Option[Int] = x => if (x % 2 == 0) Some(x) else None
+
+    it("return `None` if any element maps to `None` under `f`") {
+      traverse(List(1))(f) should equal(None)
+      traverse(List(3, 1))(f) should equal(None)
+      traverse(List(1, 2))(f) should equal(None)
+      traverse(List(2, 1))(f) should equal(None)
+    }
+
+    it("return `Some(List(_))` if all elements map to `Some(_)` under `f`") {
+      traverse(List(2, 4))(f) should equal(Some(List(2, 4)))
+    }
+
+  }
+
 }
