@@ -24,8 +24,8 @@ sealed trait Stream[+A] {
 
   /**
     * Ex 5.2
-    * Write the function take(n) for returning the first n elements of a Stream,
-    * and drop(n) for skipping the first n elements of a Stream.
+    * Write the function `take(n)` for returning the first n elements of a Stream,
+    * and `drop(n)` for skipping the first n elements of a Stream.
     */
   def take(n: Int): Stream[A] = this match {
     case Cons(h, t) if n > 1 => cons(h(), t().take(n - 1))
@@ -35,6 +35,15 @@ sealed trait Stream[+A] {
 
   def drop(n: Int): Stream[A] = this match {
     case Cons(_, t) if n > 0 => t().drop(n - 1)
+    case _ => this
+  }
+
+  /** Ex 5.3
+    * Write the function `takeWhile` for returning all starting elements of a Stream that match the given predicate.
+    */
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Cons(h, t) if p(h()) => cons(h(), t().takeWhile(p))
+    case Cons(h, t) if !p(h()) => t().takeWhile(p)
     case _ => this
   }
 

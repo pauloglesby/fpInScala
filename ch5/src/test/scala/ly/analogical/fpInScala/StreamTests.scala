@@ -42,4 +42,22 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`takeWhile` should") {
+
+    val p: Int => Boolean = _ % 2 == 0
+
+    it("return an `Empty` when called on `Empty`") {
+      Empty.takeWhile(p) should equal(Empty)
+    }
+
+    it("return `Empty` if none of the elements satisfy the predicate") {
+      Stream(1, 3, 5).takeWhile(p) should equal(Empty)
+    }
+
+    it("return only the elements that satisfy the predicate") {
+      Stream(1, 2, 3, 4).takeWhile(p).toList should equal(List(2, 4))
+    }
+
+  }
+
 }
