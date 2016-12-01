@@ -47,6 +47,28 @@ sealed trait Stream[+A] {
     case _ => this
   }
 
+  /**
+    * Ex 5.4
+    * Implement forAll, which checks that all elements in the Stream match a given predicate.
+    * Your implementation should terminate the traversal as soon as it encounters a nonmatching value.
+    */
+  def forAllNoFold(p: A => Boolean): Boolean = this match {
+    case Cons(h, t) => p(h()) && t().forAllNoFold(p)  // NB: && is non-strict in its second argument; first `p(h()) == false` terminates
+    case _ => true
+  }
+
+  /**
+    * Non-strict `foldRight`
+    * Note that `f` takes its second argument by name and may choose not to evaluate it.
+    */
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
+    case Cons(h,t) => f(h(), t().foldRight(z)(f))
+    case _ => z
+  }
+
+  def forAll(p: A => Boolean) = this.foldRight(true)((a, b) => p(a) && b)   // NB && non-strict, AND b is tail of stream (also non-strict)
+  def exists(p: A => Boolean) = this.foldRight(false)((a, b) => p(a) || b)  // Again, || non-strict - just takes one p(a) == true to terminate
+
 }
 
 case object Empty extends Stream[Nothing]
