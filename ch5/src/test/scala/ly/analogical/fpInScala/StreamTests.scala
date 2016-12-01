@@ -80,4 +80,20 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`takeWhileFromFoldRight` should") {
+
+    it("return `Empty` when called on `Empty`") {
+      Empty.takeWhileFromFoldRight(p) should equal(Empty)
+    }
+
+    it("return `Empty` if none of the elements satisfy the predicate") {
+      Stream(1, 3, 5).takeWhileFromFoldRight(p) should equal(Empty)
+    }
+
+    it("return only the elements that satisfy the predicate") {
+      Stream(1, 2, 3, 4).takeWhileFromFoldRight(p).toList should equal(List(2, 4))
+    }
+
+  }
+
 }
