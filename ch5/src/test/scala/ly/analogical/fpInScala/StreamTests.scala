@@ -2,6 +2,8 @@ package ly.analogical.fpInScala
 
 class StreamTests extends BaseSpec {
 
+  import Stream._
+
   val p: Int => Boolean = _ % 2 == 0
 
   describe("`toList` should") {
@@ -153,6 +155,30 @@ class StreamTests extends BaseSpec {
 
     it("map elements to streams and output a composite stream") {
       Stream(1, 3, 5).flatMap(streamFrom).toList should equal(List(1, 2, 3, 4, 5, 6))
+    }
+
+  }
+
+  describe("`constant` should") {
+
+    it("produce an infinite stream of the input value") {
+      constant("hi!").take(3).toList should equal(List("hi!", "hi!", "hi!"))
+    }
+
+  }
+
+  describe("`from` should") {
+
+    it("produce an infinite stream of consecutive integers from n") {
+      from(5).take(3).toList should equal(List(5, 6, 7))
+    }
+
+  }
+
+  describe("`fibs` should") {
+
+    it("produce an infinite stream of fibonacci numbers") {
+      fibs.take(10).toList should equal(List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34))
     }
 
   }
