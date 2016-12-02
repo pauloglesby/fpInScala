@@ -66,15 +66,15 @@ sealed trait Stream[+A] {
     case _ => z
   }
 
-  def forAll(p: A => Boolean): Boolean = this.foldRight(true)((a, b) => p(a) && b)   // NB && non-strict, AND b is tail of stream (also non-strict)
-  def exists(p: A => Boolean): Boolean = this.foldRight(false)((a, b) => p(a) || b)  // Again, || non-strict - just takes one p(a) == true to terminate
+  def forAll(p: A => Boolean): Boolean = foldRight(true)((a, b) => p(a) && b)   // NB && non-strict, AND b is tail of stream (also non-strict)
+  def exists(p: A => Boolean): Boolean = foldRight(false)((a, b) => p(a) || b)  // Again, || non-strict - just takes one p(a) == true to terminate
 
   /**
     * Ex 5.5
     * Use `foldRight` to implement `takeWhile`.
     */
   def takeWhileFromFoldRight(p: A => Boolean): Stream[A] =
-    this.foldRight[Stream[A]](Empty)((a, as) => if (p(a)) cons(a, as) else as)
+    foldRight[Stream[A]](Empty)((a, as) => if (p(a)) cons(a, as) else as)
 
 }
 
