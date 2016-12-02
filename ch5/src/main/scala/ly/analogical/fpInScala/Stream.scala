@@ -74,7 +74,7 @@ sealed trait Stream[+A] {
     * Use `foldRight` to implement `takeWhile`.
     */
   def takeWhileFromFoldRight(p: A => Boolean): Stream[A] =
-    foldRight[Stream[A]](Empty)((a, as) => if (p(a)) cons(a, as) else as)
+    foldRight(empty[A])((a, as) => if (p(a)) cons(a, as) else as)
 
   /**
     * Ex 5.6
