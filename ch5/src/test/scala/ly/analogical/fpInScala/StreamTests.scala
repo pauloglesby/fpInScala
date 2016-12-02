@@ -57,8 +57,8 @@ class StreamTests extends BaseSpec {
       Stream(1, 3, 5).takeWhile(p) should equal(Empty)
     }
 
-    it("return only the elements that satisfy the predicate") {
-      Stream(1, 2, 3, 4).takeWhile(p).toList should equal(List(2, 4))
+    it("return only elements up to the first non-satisfaction of the predicate") {
+      Stream(2, 4, 5, 6).takeWhile(p).toList should equal(List(2, 4))
     }
 
   }
@@ -211,6 +211,74 @@ class StreamTests extends BaseSpec {
 
     it("produce an infinite stream of fibonacci numbers") {
       fibsFromUnfold.take(10).toList should equal(List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34))
+    }
+
+  }
+
+  describe("`mapFromUnfold` should") {
+
+    val f: Int => String = _.toString
+
+    it("return `Empty` when called on `Empty`") {
+      Empty.mapFromUnfold(f) should equal(Empty)
+    }
+
+    it("return a stream of mapped values") {
+      Stream(1, 2).mapFromUnfold(f).toList should equal(List("1", "2"))
+    }
+
+  }
+
+  describe("`takeFromUnfold` should") {
+
+    it("return an `Empty` when called on `Empty`") {
+      Empty.takeFromUnfold(1) should equal(Empty)
+    }
+
+    it("return the first n elements of the Stream as a Stream") {
+      // NB need to evaluate the stream to test it, so use `toList`!
+      // otherwise we just end up looking at uncalled anonymous functions
+      Stream(1, 2, 3, 4).takeFromUnfold(3).toList should equal(List(1, 2, 3))
+    }
+
+  }
+
+  describe("`takeWhileFromUnfold` should") {
+
+    it("return `Empty` when called on `Empty`") {
+      Empty.takeWhileFromUnfold(p) should equal(Empty)
+    }
+
+    it("return `Empty` if none of the elements satisfy the predicate") {
+      Stream(1, 3, 5).takeWhileFromUnfold(p) should equal(Empty)
+    }
+
+    it("return only the elements that satisfy the predicate") {
+      Stream(2, 4, 5, 6).takeWhileFromUnfold(p).toList should equal(List(2, 4))
+    }
+
+  }
+
+  describe("`zipWith` should") {
+
+    val f: (Int, Int) => Int = _ * _
+
+    it("return a stream that terminates according to the shortest input stream") {
+      Stream(1, 2, 3).zipWith(Stream(1, 2))(f).toList should equal(List(1, 4))
+      Stream(1, 2).zipWith(Stream(1, 2, 3))(f).toList should equal(List(1, 4))
+      Stream(1, 2).zipWith(Stream.empty[Int])(f) should equal(Empty)
+      Stream.empty[Int].zipWith(Stream(1, 2))(f) should equal(Empty)
+    }
+
+  }
+
+  describe("`zipAll` should") {
+
+    it("return a stream of paired options according to input terminations") {
+      Stream(1, 2, 3).zipAll(Stream(1, 2)).toList should equal(List((Some(1), Some(1)), (Some(2), Some(2)), (Some(3), None)))
+      Stream(1, 2).zipAll(Stream(1, 2, 3)).toList should equal(List((Some(1), Some(1)), (Some(2), Some(2)), (None, Some(3))))
+      Stream(1, 2).zipAll(Stream.empty[Int]).toList should equal(List((Some(1), None), (Some(2), None)))
+      Stream.empty[Int].zipAll(Stream(1, 2)).toList should equal(List((None, Some(1)), (None, Some(2))))
     }
 
   }
