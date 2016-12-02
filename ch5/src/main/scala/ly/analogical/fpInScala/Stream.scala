@@ -43,8 +43,7 @@ sealed trait Stream[+A] {
     */
   def takeWhile(p: A => Boolean): Stream[A] = this match {
     case Cons(h, t) if p(h()) => cons(h(), t().takeWhile(p))
-    case Cons(h, t) if !p(h()) => t().takeWhile(p)
-    case _ => this
+    case _ => empty[A]
   }
 
   /**
@@ -74,7 +73,7 @@ sealed trait Stream[+A] {
     * Use `foldRight` to implement `takeWhile`.
     */
   def takeWhileFromFoldRight(p: A => Boolean): Stream[A] =
-    foldRight(empty[A])((a, as) => if (p(a)) cons(a, as) else as)
+    foldRight(empty[A])((a, as) => if (p(a)) cons(a, as) else empty[A])
 
   /**
     * Ex 5.6

@@ -93,7 +93,7 @@ class StreamTests extends BaseSpec {
     }
 
     it("return only the elements that satisfy the predicate") {
-      Stream(1, 2, 3, 4).takeWhileFromFoldRight(p).toList should equal(List(2, 4))
+      Stream(2, 4, 5, 6).takeWhileFromFoldRight(p).toList should equal(List(2, 4))
     }
 
   }
