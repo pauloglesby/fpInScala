@@ -108,4 +108,53 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`map` should") {
+
+    val f: Int => String = _.toString
+
+    it("return `Empty` when called on `Empty`") {
+      Empty.map(f) should equal(Empty)
+    }
+
+    it("return a stream of mapped values") {
+      Stream(1, 2).map(f).toList should equal(List("1", "2"))
+    }
+
+  }
+
+  describe("`filter` should") {
+
+    it("return `Empty` when called on `Empty`") {
+      Empty.filter(p) should equal(Empty)
+    }
+
+    it("return a stream of values satisfying the predicate") {
+      Stream(1, 2, 3, 4).filter(p).toList should equal(List(2, 4))
+    }
+
+  }
+
+  describe("`append` should") {
+
+    it("append a stream to the end of a stream") {
+      Empty.append(Stream(1)).toList should equal(List(1))
+      Stream(1, 2).append(Stream(3, 4)).toList should equal(List(1, 2, 3, 4))
+    }
+
+  }
+
+  describe("`flatMap` should") {
+
+    def streamFrom(x: Int): Stream[Int] = Stream(x, x + 1)
+
+    it("return `Empty` when called on `Empty`") {
+      Empty.flatMap(streamFrom) should equal(Empty)
+    }
+
+    it("map elements to streams and output a composite stream") {
+      Stream(1, 3, 5).flatMap(streamFrom).toList should equal(List(1, 2, 3, 4, 5, 6))
+    }
+
+  }
+
 }
