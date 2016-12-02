@@ -183,4 +183,36 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`onesFromUnfold` should") {
+
+    it("produce an infinite stream of 1s") {
+      onesFromUnfold.take(3).toList should equal(List(1, 1, 1))
+    }
+
+  }
+
+  describe("`constantFromUnfold` should") {
+
+    it("produce an infinite stream of the input value") {
+      constantFromUnfold("hi!").take(3).toList should equal(List("hi!", "hi!", "hi!"))
+    }
+
+  }
+
+  describe("`fromFromUnfold` should") {
+
+    it("produce an infinite stream of consecutive integers from n") {
+      fromFromUnfold(5).take(3).toList should equal(List(5, 6, 7))
+    }
+
+  }
+
+  describe("`fibsFromUnfold` should") {
+
+    it("produce an infinite stream of fibonacci numbers") {
+      fibsFromUnfold.take(10).toList should equal(List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34))
+    }
+
+  }
+
 }
