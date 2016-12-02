@@ -96,4 +96,16 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`headOptionFromFoldRight` should") {
+
+    it("return `None` when called on `Empty`") {
+      Empty.headOptionFromFoldRight should equal(None)
+    }
+
+    it("return `Some(h)` when called on a non-empty stream") {
+      Stream(1, 2).headOptionFromFoldRight should equal(Some(1))
+    }
+
+  }
+
 }
