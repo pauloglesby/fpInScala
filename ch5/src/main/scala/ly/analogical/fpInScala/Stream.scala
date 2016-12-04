@@ -115,7 +115,7 @@ sealed trait Stream[+A] {
     case _ => None
   }
 
-  def zipWith[B,C](sb: Stream[B])(f: (A, B) => C): Stream[C] = unfold((this, sb)) {
+  def zipWith[B, C](sb: Stream[B])(f: (A, B) => C): Stream[C] = unfold((this, sb)) {
     case (Cons(ha, ta), Cons(hb, tb)) => Some(f(ha(), hb()), (ta(), tb()))
     case _ => None
   }
@@ -126,6 +126,34 @@ sealed trait Stream[+A] {
     case (_, Cons(hb, tb)) => Some((None, Some(hb())), (empty[A], tb()))
     case _ => None
   }
+
+  /**
+    * BOOM
+    * No need to have pair of streams as state; we're streaming over the complete sb from every "initial" element
+    * Use `zipAll` inside of `unfold` instead of `zipWith`
+    * Hint: need both a and b available to ensure complete subsequence match
+    * BUT: if we `takeWhile` on a *and* b defined, we risk truncating the subsequence and returning a false match at the end of the sequence
+    */
+  def hasSubsequence[A](sb: Stream[A]): Boolean = unfold(this) {
+    case Cons(ha, ta) =>
+      val check = {
+        // `cons(ha, ta())` won't work due to non-strictness; use `cons(ha(), ta())` instead
+        val sa = cons(ha(), ta())
+        sa.zipAll(sb)
+          .takeWhile { case (_, ob) => ob.isDefined }
+          .foldRight(true) { case ((oa, ob), equal) =>
+            {
+              for {
+                a <- oa
+                b <- ob
+              } yield a == b
+            }.getOrElse(false) && equal
+          }
+      }
+      Some(check, ta())
+    case _ => None
+  }.exists(_ == true)
+
 }
 
 case object Empty extends Stream[Nothing]

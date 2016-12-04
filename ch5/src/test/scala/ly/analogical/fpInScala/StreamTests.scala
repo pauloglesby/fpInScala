@@ -283,4 +283,28 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`hasSubsequence` should") {
+
+    it("return false if called on `Empty`") {
+      Empty.hasSubsequence(Stream(1, 2, 3)) should equal(false)
+    }
+
+    it("return true if the subsequence is `Empty`") {
+      Stream(1, 2, 3).hasSubsequence(Empty) should equal(true)
+    }
+
+    it("return false if the input stream has no common values") {
+      Stream(1, 2, 3).hasSubsequence(Stream(4, 5)) should equal(false)
+    }
+
+    it("return false if the input stream is only a partial subsequence") {
+      Stream(1, 2, 3, 4).hasSubsequence(Stream(3, 4, 5)) should equal(false)
+    }
+
+    it("return true if the input stream is a complete subsequence") {
+      Stream(1, 2, 3, 2, 3, 4, 5, 6).hasSubsequence(Stream(2, 3, 4)) should equal(true)
+    }
+
+  }
+
 }
