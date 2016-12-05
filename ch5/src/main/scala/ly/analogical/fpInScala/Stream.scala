@@ -1,7 +1,5 @@
 package ly.analogical.fpInScala
 
-import scala.annotation.tailrec
-
 sealed trait Stream[+A] {
 
   import Stream._
