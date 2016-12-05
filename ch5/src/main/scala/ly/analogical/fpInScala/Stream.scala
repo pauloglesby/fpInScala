@@ -186,6 +186,42 @@ sealed trait Stream[+A] {
 
   def hasSubsequenceViaTails[A](s: Stream[A]): Boolean = tails.exists(_ startsWith s)
 
+  /**
+    * Ex 5.16
+    * Hard: Generalize tails to the function scanRight, which is like a foldRight that returns a stream of the intermediate results. For example:
+    *    scala> Stream(1, 2, 3).scanRight(0)(_ + _).toList
+    *    res0: List[Int] = List(6, 5, 3, 0)
+    * This example should be equivalent to the expression List(1 + 2 + 3 + 0, 2 + 3 + 0, 3 + 0, 0).
+    * Your function should reuse intermediate results so that traversing a Stream with n elements always takes time linear in n.
+    * Can it be implemented using unfold? How, or why not? Could it be implemented using another function we’ve written?
+    */
+  def scanRightViaUnfold[B](z: B)(f: (A, => B) => B): Stream[B] = unfold[B, Option[Stream[A]]](Some(this)) {
+    case Some(Cons(h, t)) => Some((f(h(), t().foldRight(z)(f)), Some(t())))
+    case Some(Empty) => Some((z, None))
+    case _ => None
+  }
+
+  /**
+    * From the solutions...
+    * The function can't be implemented using `unfold`, since `unfold` generates elements of the `Stream` from left to right.
+    * It can be implemented using `foldRight` though.
+    * The implementation is just a `foldRight` that keeps the accumulated value and the stream of intermediate results,
+    * which we `cons` onto during each iteration.
+    * When writing folds, it's common to have more state in the fold than is needed to compute the result.
+    * Here, we simply extract the accumulated list once finished.
+    */
+  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] =
+    foldRight((z, Stream(z))) { case (a, (b1, s)) =>
+      {
+        // a is passed by-name and used in by-name args in f and cons. So use lazy val to ensure only one evaluation...
+        lazy val head = b1
+        lazy val tail = s
+        val b2 = f(a, head)
+        (b2, cons(b2, tail))
+      }
+    }._2
+
+
 }
 
 case object Empty extends Stream[Nothing]

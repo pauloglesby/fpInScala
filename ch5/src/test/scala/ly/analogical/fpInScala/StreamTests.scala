@@ -336,4 +336,12 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`scanRight` should") {
+
+    it("return a stream of intermediate results from a fold") {
+      Stream(1, 2, 3).scanRight(0)(_ + _).toList should equal(List(6, 5, 3, 0))
+    }
+
+  }
+
 }
