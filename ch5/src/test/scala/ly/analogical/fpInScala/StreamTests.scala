@@ -307,4 +307,33 @@ class StreamTests extends BaseSpec {
 
   }
 
+  describe("`startsWith` should") {
+
+    it("return false if called on `Empty`") {
+      Empty.startsWith(Stream(1, 2)) should equal(false)
+    }
+
+    it("return false if the stream does not start with the input") {
+      Stream(1, 2, 3).startsWith(Stream(2)) should equal(false)
+      Stream(1, 2, 3).startsWith(Stream(2, 1)) should equal(false)
+      Stream(1, 2, 3).startsWith(Stream(2, 3, 4)) should equal(false)
+      Stream(1, 2, 3).startsWith(Stream(1, 2, 3, 4)) should equal(false)
+    }
+
+    it("return true if the stream does start with the input") {
+      Stream(1, 2, 3).startsWith(Stream(1)) should equal(true)
+      Stream(1, 2, 3).startsWith(Stream(1, 2)) should equal(true)
+      Stream(1, 2, 3).startsWith(Stream(1, 2, 3)) should equal(true)
+    }
+
+  }
+
+  describe("`tails` should") {
+
+    it("return a stream of all suffixes in order of occurrence") {
+      Stream(1, 2, 3).tails.toList.map(_.toList) should equal(List(List(1, 2, 3), List(2, 3), List(3), Nil))
+    }
+
+  }
+
 }
