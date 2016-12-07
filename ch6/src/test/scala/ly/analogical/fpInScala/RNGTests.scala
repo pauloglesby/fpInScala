@@ -8,7 +8,7 @@ class RNGTests extends BaseSpec with GeneratorDrivenPropertyChecks {
   import RNG._
 
   val genSimpleRNG = Gen.choose(Long.MinValue, Long.MaxValue).map(SimpleRNG)
-  val genCount = Gen.choose(1, 100)
+  val genInt = Gen.choose(1, 100)
 
   describe("`nonNegativeInt` should") {
 
@@ -52,7 +52,7 @@ class RNGTests extends BaseSpec with GeneratorDrivenPropertyChecks {
   describe("`ints` should") {
 
     it("produce a list of integers of length `count`") {
-      forAll(genCount, genSimpleRNG) { (n, r) =>
+      forAll(genInt, genSimpleRNG) { (n, r) =>
         ints(n)(r)._1.length should equal(n)
       }
     }
@@ -74,8 +74,20 @@ class RNGTests extends BaseSpec with GeneratorDrivenPropertyChecks {
   describe("`intsFromSequence` should") {
 
     it("produce a list of integers of length `count`") {
-      forAll(genCount, genSimpleRNG) { (n, r) =>
+      forAll(genInt, genSimpleRNG) { (n, r) =>
         intsFromSequence(n)(r)._1.length should equal(n)
+      }
+    }
+
+  }
+
+  describe("`nonNegativeLessThan` should") {
+
+    it("produce an integer between 0 (inclusive) and n (exclusive)") {
+      forAll(genInt, genSimpleRNG) { (n, r) =>
+        val i = nonNegativeLessThan(n)(r)._1
+        i should be >= 0
+        i should be < n
       }
     }
 
