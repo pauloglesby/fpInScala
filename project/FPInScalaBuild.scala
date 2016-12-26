@@ -16,7 +16,7 @@ object FPInScalaBuild extends Build {
     "root",
     file("."),
     settings = scalaProjectSettings
-  ).aggregate(common, ch2, ch3, ch4, ch5, ch6)
+  ).aggregate(common, ch2, ch3, ch4, ch5, ch6, ch7)
 
   lazy val common = Project(
     "common",
@@ -51,6 +51,12 @@ object FPInScalaBuild extends Build {
   lazy val ch6 = Project(
     "ch6",
     file("ch6"),
+    settings = scalaProjectSettings
+  ).dependsOn(common % compileTest)
+
+  lazy val ch7 = Project(
+    "ch7",
+    file("ch7"),
     settings = scalaProjectSettings
   ).dependsOn(common % compileTest)
 
