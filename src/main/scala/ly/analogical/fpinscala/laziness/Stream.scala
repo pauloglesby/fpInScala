@@ -126,6 +126,15 @@ sealed trait Stream[+A] {
     case _ => None
   }
 
+  def zip[B](bs: Stream[B]): Stream[(A, B)] = zipWith(bs)((_, _))
+
+  def find(f: A => Boolean): Option[A] = unfold(this) {
+    case Cons(h, t) =>
+      val hMemo = h()
+      if (f(hMemo)) Some(Some(hMemo), empty[A]) else Some(None, t())
+    case _ => None
+  }.headOption.flatten
+
   /**
     * BOOM
     * No need to have pair of streams as state; we're streaming over the complete sb from every "initial" element
