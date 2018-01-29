@@ -2,15 +2,15 @@ package ly.analogical.fpinscala
 package testing
 
 import Prop._
-import state.{RNG, State}
+import state.{RNG, SimpleRNG, State}
 import laziness.Stream
 
-case class Prop(run: (TestCases, RNG) => Result) {
+case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
 
   def &&(p: Prop): Prop = Prop(
-    (n, rng) => {
-      val result = run(n, rng)
-      val pResult = p.run(n, rng)
+    (max, n, rng) => {
+      val result = run(max, n, rng)
+      val pResult = p.run(max, n, rng)
       (result, pResult) match {
         case (Passed, Passed) => Passed
         case (f@Falsified(_, _), _) => f
@@ -20,9 +20,9 @@ case class Prop(run: (TestCases, RNG) => Result) {
   )
 
   def ||(p: Prop): Prop = Prop(
-    (n, rng) => {
-      val result = run(n, rng)
-      val pResult = p.run(n, rng)
+    (max, n, rng) => {
+      val result = run(max, n, rng)
+      val pResult = p.run(max, n, rng)
       (result, pResult) match {
         case (Passed, _) => Passed
         case (_, Passed) => Passed
@@ -37,6 +37,7 @@ object Prop {
   type SuccessCount = Int
   type FailedCase = String
   type TestCases = Int
+  type MaxSize = Int
 
   sealed trait Result extends Product with Serializable {
     def isFalsified: Boolean
@@ -50,14 +51,45 @@ object Prop {
     override def isFalsified: Boolean = true
   }
 
-  def forAll[A](as: Gen[A])(f: A => Boolean): Prop = Prop(
-    (n, rng) => randomStream(as)(rng).zip(Stream.from(0)).take(n).map {
+  def run(p: Prop,
+          maxSize: MaxSize = 100,
+          testCases: TestCases = 100,
+          rng: RNG = SimpleRNG(System.currentTimeMillis())
+         ): Result = {
+    p.run(maxSize, testCases, rng) match {
+      case r: Falsified =>
+        println(s"! Falsified after ${r.successes} passed tests:\n ${r.failure}")
+        r
+      case r: Passed.type =>
+        println(s"+ OK, passed $testCases tests.")
+        r
+    }
+  }
+
+  def forAll[A](as: Gen[A])(f: A => Boolean): Prop = Prop {
+    (_, n,rng) => randomStream(as)(rng).zip(Stream.from(0)).take(n).map {
       case (a, i) => try {
         if (f(a)) Passed else Falsified(a.toString, i)
-      } catch {
-        case e: Exception => Falsified(buildMsg(a, e), i)
-      }
+      } catch { case e: Exception => Falsified(buildMsg(a, e), i) }
     }.find(_.isFalsified).getOrElse(Passed)
+  }
+
+  implicit def unsized[A](g: Gen[A]): SGen[A] = SGen(_ => g)
+
+  def forAll[A](g: SGen[A])(f: A => Boolean): Prop =
+    forAll(g.forSize)(f)
+
+  def forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop = Prop(
+    (max, n, rng) => {
+      val casesPerSize: TestCases = (n + (max - 1)) / max
+      val props: Stream[Prop] =
+        Stream.from(0).take((n min max) + 1).map(i => forAll(g(i))(f))
+      val prop: Prop =
+        props.map(p => Prop { (max, _, rng) =>
+          p.run(max, casesPerSize, rng)
+        }).toList.reduce(_ && _)
+      prop.run(max, n, rng)
+    }
   )
 
   def randomStream[A](g: Gen[A])(rng: RNG): Stream[A] =
@@ -72,6 +104,9 @@ object Prop {
 
 case class Gen[A](sample: State[RNG, A]) {
 
+  def map[B](f: A => B): Gen[B] =
+    Gen(sample.map(f))
+
   def flatMap[B](f: A => Gen[B]): Gen[B] =
     Gen(sample.flatMap(f(_).sample))
 
@@ -80,6 +115,8 @@ case class Gen[A](sample: State[RNG, A]) {
 
   def listOfN(size: Gen[Int]): Gen[List[A]] =
     size.flatMap(listOfN)
+
+  def unsized: SGen[A] = SGen(_ => this)
 
 }
 
@@ -145,5 +182,25 @@ object Gen {
     val state = State(RNG.double).flatMap(w => if (w < threshold) gen1.sample else gen2.sample)
     Gen(state)
   }
+
+  def listOf[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => g.listOfN(n))
+
+  def listOf1[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => g.listOfN(n max 1))
+
+}
+
+case class SGen[A](forSize: Int => Gen[A]) {
+
+  def flatMap[B](f: A => SGen[B]): SGen[B] = {
+    val forSizeB: Int => Gen[B] = n => {
+      forSize(n).flatMap(f(_).forSize(n))
+    }
+    SGen(forSizeB)
+  }
+
+  def map[B](f: A => B): SGen[B] =
+    SGen(forSize(_).map(f))
 
 }
